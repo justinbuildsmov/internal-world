@@ -1,0 +1,215 @@
+{
+ "grid": {
+  "step": 2,
+  "rows": 90,
+  "cols": 180,
+  "lat0": 89.0,
+  "lon0": -179.0
+ },
+ "prompt": "Elevation in meters above sea level at each (latitude, longitude)? Negative for ocean depth. Give your best guess for every point, even if unsure. Reply with only a JSON array of {n} integers.\n\n{points}",
+ "stops": [
+  [
+   -8000,
+   [
+    8,
+    20,
+    60
+   ]
+  ],
+  [
+   -3000,
+   [
+    20,
+    60,
+    130
+   ]
+  ],
+  [
+   -200,
+   [
+    60,
+    120,
+    190
+   ]
+  ],
+  [
+   0,
+   [
+    150,
+    200,
+    230
+   ]
+  ],
+  [
+   1,
+   [
+    70,
+    130,
+    70
+   ]
+  ],
+  [
+   500,
+   [
+    150,
+    160,
+    90
+   ]
+  ],
+  [
+   1500,
+   [
+    140,
+    100,
+    60
+   ]
+  ],
+  [
+   3000,
+   [
+    110,
+    85,
+    70
+   ]
+  ],
+  [
+   5000,
+   [
+    240,
+    240,
+    240
+   ]
+  ]
+ ],
+ "models": [
+  {
+   "id": "claude-haiku-4-5",
+   "label": "Claude Haiku 4.5",
+   "short": "Haiku 4.5",
+   "family": "claude",
+   "done": 1.0,
+   "elev": "data/claude-haiku-4-5.json",
+   "landwater": 0.7994,
+   "mae": 1582.6,
+   "corr": 0.6306
+  },
+  {
+   "id": "claude-sonnet-4-5",
+   "label": "Claude Sonnet 4.5",
+   "short": "Sonnet 4.5",
+   "family": "claude",
+   "done": 1.0,
+   "elev": "data/claude-sonnet-4-5.json",
+   "landwater": 0.9095,
+   "mae": 904.9,
+   "corr": 0.838
+  },
+  {
+   "id": "claude-opus-4-5",
+   "label": "Claude Opus 4.5",
+   "short": "Opus 4.5",
+   "family": "claude",
+   "done": 1.0,
+   "elev": "data/claude-opus-4-5.json",
+   "landwater": 0.9586,
+   "mae": 652.7,
+   "corr": 0.9136
+  },
+  {
+   "id": "claude-opus-5-5",
+   "label": "Claude Opus 5.5",
+   "short": "Opus 5.5",
+   "family": "claude",
+   "done": 1.0,
+   "elev": "data/claude-opus-5-5.json",
+   "landwater": 0.9856,
+   "mae": 418.1,
+   "corr": 0.9632
+  },
+  {
+   "id": "claude-fable-5-1",
+   "label": "Claude Fable 5.1",
+   "short": "Fable 5.1",
+   "family": "claude",
+   "done": 1.0,
+   "elev": "data/claude-fable-5-1.json",
+   "landwater": 0.9815,
+   "mae": 355.6,
+   "corr": 0.9754
+  },
+  {
+   "id": "gpt-5.5",
+   "label": "GPT-5.5",
+   "short": "5.5",
+   "family": "gpt",
+   "done": 1.0,
+   "elev": "data/gpt-5.5.json",
+   "landwater": 0.9454,
+   "mae": 764.3,
+   "corr": 0.9034
+  },
+  {
+   "id": "gpt-5.6-sol",
+   "label": "GPT-5.6 Sol",
+   "short": "5.6 Sol",
+   "family": "gpt",
+   "done": 1.0,
+   "elev": "data/gpt-5.6-sol.json",
+   "landwater": 0.97,
+   "mae": 608.9,
+   "corr": 0.9341
+  },
+  {
+   "id": "gpt-6-luna",
+   "label": "GPT-6 Luna",
+   "short": "6 Luna",
+   "family": "gpt",
+   "done": 1.0,
+   "elev": "data/gpt-6-luna.json",
+   "landwater": 0.7831,
+   "mae": 1965.9,
+   "corr": 0.345
+  },
+  {
+   "id": "gpt-6-astra",
+   "label": "GPT-6 Astra",
+   "short": "6 Astra",
+   "family": "gpt",
+   "done": 1.0,
+   "elev": "data/gpt-6-astra.json",
+   "landwater": 0.9868,
+   "mae": 437.2,
+   "corr": 0.9661
+  },
+  {
+   "id": "gpt-6.1-sol",
+   "label": "GPT-6.1 Sol",
+   "short": "6.1 Sol",
+   "family": "gpt",
+   "done": 1.0,
+   "elev": "data/gpt-6.1-sol.json",
+   "landwater": 0.9876,
+   "mae": 455.9,
+   "corr": 0.9626
+  }
+ ],
+ "findings": [
+  {
+   "title": "Tibet comes out white, and that's correct",
+   "body": "Every strong model draws the Tibetan Plateau as a solid block above 4,500 m. The real plateau averages 4,500 to 5,000 m. They know it from text alone."
+  },
+  {
+   "title": "The older model thinks 8\u00d7 longer and does worse",
+   "body": "Same 60 points, one call each: Opus 5.5 answered in 18 seconds with about 1,800 thinking tokens. Opus 4.5 took 3 minutes and about 14,000, and scored lower."
+  },
+  {
+   "title": "Haiku first refused",
+   "body": "Asked to answer from memory, the smallest model declined. Told to give its best guess, it drew a recognizable planet.",
+   "quote": "I don't have detailed elevation and bathymetry data memorized for specific coordinates."
+  },
+  {
+   "title": "Haiku can't count to 60",
+   "body": "It returned 59, 61, 62 or 63 numbers instead of 60 on 8 of 270 batches. The elevations were fine; it just loses its place in the list."
+  }
+ ]
+}
