@@ -7,8 +7,8 @@ import { Segmented } from "@/components/ui/segmented";
 import { FileText } from "lucide-react";
 import { fmt, pct, type Mode, type Model, type Results } from "@/lib/world";
 
-// Paper = the write-up below the map. TODO: GitHub link once the repo is public.
-const LINKS = { paper: "#paper", github: "#" };
+// Paper = the write-up below the map.
+const LINKS = { paper: "#paper", github: "https://github.com/justinbuildsmov/internal-world" };
 
 const FAMILY = { claude: "Claude", gpt: "GPT" } as const;
 const FAMILY_NAME = { claude: "Claude", gpt: "ChatGPT" } as const;
@@ -63,7 +63,7 @@ export default function Home() {
           <div className="text-sm text-white/45 mt-3">an experiment by @justinbuilds.mov</div>
         </div>
 
-        <nav className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 flex gap-2">
+        <nav className="absolute left-4 top-[100px] sm:left-auto sm:top-8 sm:right-8 z-10 flex gap-2">
           <a href={LINKS.paper} className="flex h-9 items-center gap-2 rounded-full bg-white/[.06] ring-1 ring-inset ring-white/[.1] backdrop-blur-xl px-4 text-[13px] text-white/80 hover:text-white hover:bg-white/[.1] transition">
             <FileText className="size-3.5" /> Paper
           </a>
@@ -78,18 +78,18 @@ export default function Home() {
             real={truth[hover.i * g.cols + hover.j]} lat={g.lat0 - hover.i * g.step} lon={g.lon0 + hover.j * g.step} />
         )}
 
-        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-6 bg-gradient-to-t from-[#05070c] via-[#05070c]/85 to-transparent pt-20">
-          <div className="mx-auto max-w-5xl flex flex-col gap-4">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-24 sm:px-6 sm:pb-6 bg-gradient-to-t from-[#05070c] via-[#05070c]/85 to-transparent">
+          <div className="mx-auto max-w-5xl flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:gap-4">
               <Stats model={model} total={ranked.length} mode={mode} />
-              <Segmented id="mode" value={mode} onChange={(v) => setMode(v as Mode)}
+              <Segmented id="mode" value={mode} onChange={(v) => setMode(v as Mode)} className="w-full md:w-auto" stretch
                 items={[{ value: "model", label: "Model's Earth" }, { value: "real", label: "Real Earth" }, { value: "error", label: "Difference" }]} />
             </div>
             <div className="flex flex-col gap-2">
               {(Object.keys(FAMILY) as (keyof typeof FAMILY)[]).map((f) => (
-                <div key={f} className="flex items-center gap-3 min-w-0">
-                  <span className="w-16 shrink-0 text-[13px] font-medium" style={{ color: FAMILY_COLOR[f] }}>{FAMILY_NAME[f]}</span>
-                  <Segmented id={`fam-${f}`} accent={FAMILY_COLOR[f]} className="max-w-full overflow-x-auto"
+                <div key={f} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3 min-w-0">
+                  <span className="sm:w-16 shrink-0 text-xs sm:text-[13px] font-medium" style={{ color: FAMILY_COLOR[f] }}>{FAMILY_NAME[f]}</span>
+                  <Segmented id={`fam-${f}`} accent={FAMILY_COLOR[f]} scroll
                     value={mode !== "real" ? sel : null} onChange={(v) => pick(v)}
                     items={data.models.filter((m) => m.family === f).map((m) => ({
                       value: m.id,
@@ -100,7 +100,10 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="text-xs text-white/30 hidden sm:block">Drag to orbit, scroll to zoom, hover to inspect.</div>
+            <div className="text-xs text-white/30">
+              <span className="hidden sm:inline">Drag to orbit, scroll to zoom, hover to inspect.</span>
+              <span className="sm:hidden">Drag to orbit, pinch to zoom, tap to inspect.</span>
+            </div>
           </div>
         </div>
       </section>
@@ -229,7 +232,7 @@ function Stats({ model, total, mode }: { model: Model; total: number; mode: Mode
     </div>
   );
   return (
-    <div className="flex items-end gap-6 sm:gap-10">
+    <div className="flex items-end gap-5 sm:gap-10">
       <div>
         <div className="text-2xl sm:text-4xl font-semibold tracking-[-0.03em] leading-none">{model.label}</div>
         <div className="text-sm text-white/45 mt-2">Ranked {model.rank} of {total}</div>
@@ -242,9 +245,9 @@ function Stats({ model, total, mode }: { model: Model; total: number; mode: Mode
 
 function Stat({ v, k }: { v: string; k: string }) {
   return (
-    <div className="hidden sm:block">
-      <div className="text-2xl font-medium tabular-nums leading-none tracking-[-0.02em]">{v}</div>
-      <div className="text-sm text-white/45 mt-2">{k}</div>
+    <div>
+      <div className="text-lg sm:text-2xl font-medium tabular-nums leading-none tracking-[-0.02em]">{v}</div>
+      <div className="text-xs sm:text-sm text-white/45 mt-1.5 sm:mt-2">{k}</div>
     </div>
   );
 }
@@ -254,14 +257,18 @@ function Stat({ v, k }: { v: string; k: string }) {
 function Tooltip({ hover, label, said, real, lat, lon }: {
   hover: NonNullable<Hover>; label: string; said: number | null; real: number; lat: number; lon: number;
 }) {
-  const flip = typeof window !== "undefined" && hover.x > window.innerWidth - 260;
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  const flip = hover.x > vw - 260;
+  const up = hover.y > vh - 200;
   const off = said == null ? null : said - real;
   const Row = ({ k, v }: { k: string; v: string }) => (
     <div className="flex justify-between gap-6"><span className="text-white/50">{k}</span><span className="tabular-nums text-white">{v}</span></div>
   );
   return (
     <div className="pointer-events-none absolute z-20 w-[220px] rounded-xl bg-[rgba(20,22,28,.92)] backdrop-blur-xl ring-1 ring-white/10 shadow-[0_12px_32px_rgba(0,0,0,.5)] p-3.5 text-[13px] leading-6"
-      style={{ left: hover.x, top: hover.y, transform: flip ? "translate(calc(-100% - 16px), 16px)" : "translate(16px, 16px)" }}>
+      style={{ left: Math.min(hover.x, vw - 16), top: hover.y,
+        transform: `translate(${flip ? "calc(-100% - 16px)" : "16px"}, ${up ? "calc(-100% - 16px)" : "16px"})` }}>
       <div className="text-xs text-white/45 mb-1.5 tabular-nums">
         {Math.abs(lat)}° {lat >= 0 ? "N" : "S"}, {Math.abs(lon)}° {lon >= 0 ? "E" : "W"}
       </div>

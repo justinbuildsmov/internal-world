@@ -113,7 +113,9 @@ export default function VoxelWorld({ rows, cols, elev, truth, mode, stops, onHov
       const aspect = w / h;
       const half = aspect > 1.6 ? 58 : 105 / aspect;
       // On wide screens, nudge the world right and down so the title has room.
-      const sx = aspect > 1.2 ? half * aspect * 0.1 : 0, sy = aspect > 1.2 ? half * 0.1 : 0;
+      // On phones (portrait) lift it instead, clear of the taller control panel.
+      const sx = aspect > 1.2 ? half * aspect * 0.1 : 0;
+      const sy = aspect > 1.2 ? half * 0.1 : aspect < 0.9 ? -half * 0.14 : 0;
       camera.left = -half * aspect - sx; camera.right = half * aspect - sx;
       camera.top = half + sy; camera.bottom = -half + sy;
       camera.updateProjectionMatrix();
@@ -154,6 +156,7 @@ export default function VoxelWorld({ rows, cols, elev, truth, mode, stops, onHov
     };
     const onLeave = () => { hoverI = -1; hoverCb.current?.(null); };
     renderer.domElement.addEventListener("pointermove", onMove);
+    renderer.domElement.addEventListener("pointerdown", onMove);
     renderer.domElement.addEventListener("pointerleave", onLeave);
 
     const col = mesh.instanceColor.array as Float32Array;
@@ -199,6 +202,7 @@ export default function VoxelWorld({ rows, cols, elev, truth, mode, stops, onHov
       cancelAnimationFrame(raf);
       ro.disconnect();
       renderer.domElement.removeEventListener("pointermove", onMove);
+      renderer.domElement.removeEventListener("pointerdown", onMove);
       renderer.domElement.removeEventListener("pointerleave", onLeave);
       controls.dispose();
       geo.dispose(); mat.dispose(); renderer.dispose();
